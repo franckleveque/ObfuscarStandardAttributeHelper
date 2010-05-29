@@ -32,3 +32,5 @@ obj/
 _ReSharper*/
 #ignore svn files
 .svn/
+#ignore tools from TreeSurgeon
+tools
