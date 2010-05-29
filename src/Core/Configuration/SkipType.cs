@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Xml.Serialization;
-
-namespace ObfuscarStandardAttributeHelper.Core.Configuration
+﻿namespace ObfuscarStandardAttributeHelper.Core.Configuration
 {
+    /// <summary>
+    /// SkipType obfuscar xml element
+    /// </summary>
     public class SkipType : SkipBase
     {
         /*

@@ -1,15 +1,21 @@
-using NUnit.Framework;
-
 namespace ObfuscarStandardAttributeHelper.UnitTests
 {
-	[TestFixture]
-	public class Test1
-	{
-		[Test]
-		public void ThisIsAnExampleTest()
-		{
-			Assert.AreEqual(2, 1+1);
-		}
-	}
+    using NUnit.Framework;
+
+    /// <summary>
+    /// TODO : Test of library
+    /// </summary>
+    [TestFixture]
+    public class Test1
+    {
+        /// <summary>
+        /// TODO : Test methods
+        /// </summary>
+        [Test]
+        public void ThisIsAnExampleTest()
+        {
+            Assert.AreEqual(2, 1 + 1);
+        }
+    }
 }
 

@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace ObfuscarStandardAttributeHelper.Core.Configuration
+﻿namespace ObfuscarStandardAttributeHelper.Core.Configuration
 {
+    /// <summary>
+    /// SkipProperty obfuscar xml element
+    /// </summary>
     public class SkipProperty : SkipElement
     {
     }
