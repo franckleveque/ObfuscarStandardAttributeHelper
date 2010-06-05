@@ -97,7 +97,8 @@
                     // We have found an Obfuscation attribute, default value doesn't apply
                     // let's fill it's attributes
                     result = new System.Reflection.ObfuscationAttribute();
-                    result.Feature = "all";
+                    // 2010-06-05.FL - "all" is already the default value of the object
+                    // result.Feature = "all";
                     foreach (CustomAttributeNamedArgument curArg in curAtt.Properties)
                     {
                         switch (curArg.Name)
