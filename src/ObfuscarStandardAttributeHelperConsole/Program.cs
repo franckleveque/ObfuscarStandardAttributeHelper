@@ -1,3 +1,26 @@
+// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="Program.cs" company="F. LEVEQUE">
+//
+// ObfuscarStandardAttributeHelper - Program used to make Obfuscar compatible with Standard obfuscation attributes
+// Copyright (C) 2010 F. LEVEQUE
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the +terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see http://www.gnu.org/licenses/.
+// </copyright>
+// <summary>
+// Email: franck.leveque2@free.fr
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
 namespace ObfuscarStandardAttributeHelper.ObfuscarStandardAttributeHelperConsole
 {
     using System;
@@ -26,6 +49,7 @@ namespace ObfuscarStandardAttributeHelper.ObfuscarStandardAttributeHelperConsole
         [STAThread]
         public static void Main(string[] args)
         {
+            ShowDisclaimer();
             if (args.GetLength(0) != 1)
             {
                 Program.ShowUsage();
@@ -62,12 +86,24 @@ namespace ObfuscarStandardAttributeHelper.ObfuscarStandardAttributeHelperConsole
         }
 
         /// <summary>
+        /// Show disclaimer of application
+        /// </summary>
+        private static void ShowDisclaimer()
+        {
+            Console.WriteLine("ObfuscarStandardAttributeHelper Copyright (C) 2010 F. LEVEQUE");
+            Console.WriteLine("This program comes with ABSOLUTELY NO WARRANTY.");
+            Console.WriteLine("This is free software, and you are welcome to redistribute it under certain conditions.");
+            Console.WriteLine("See gpl.txt for more details.");
+            Console.WriteLine();
+        }
+
+        /// <summary>
         /// Describe to the console how to use the application
         /// </summary>
         private static void ShowUsage()
         {
             Console.WriteLine("ObfuscarStandardAttributeHelper takes exactly one argument which is the obfuscar configuration file");
-            Console.WriteLine(" ex : ObfuscarStandardAttributeHelper.exe obfuscar.xml");
+            Console.WriteLine(" ex : {0} obfuscar.xml", typeof(Program).Assembly.FullName);
         }
 
         #endregion Methods
