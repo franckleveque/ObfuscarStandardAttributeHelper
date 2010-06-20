@@ -3,7 +3,6 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    // using System.Reflection;
     using System.Text;
 
     using Mono.Cecil;
@@ -18,13 +17,21 @@
         /// <summary>
         /// Assembly to be scanned
         /// </summary>
-        //private Assembly ass;
         private AssemblyDefinition ass;
 
+        /// <summary>
+        /// file path of target assembly
+        /// </summary>
         private string filePath;
 
+        /// <summary>
+        /// Assembly has been modified
+        /// </summary>
         private bool modified = false;
 
+        /// <summary>
+        /// Signature of standard obfuscation attribute type
+        /// </summary>
         private string obfuscationType = typeof(System.Reflection.ObfuscationAttribute).FullName;
 
         #endregion Fields
@@ -70,7 +77,6 @@
                     {
                         result.AddRange(this.ScanType(type, null));
                     }
-
                 }
             }
 
@@ -80,6 +86,54 @@
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// Check member for obfuscation attribute, and store result in output list
+        /// </summary>
+        /// <param name="typeToScan">Type currently scanned</param>
+        /// <param name="curMember">Member to be scanned for obfuscation attributes</param>
+        /// <param name="defaultValue">Default value of obfuscation</param>
+        /// <param name="result">List in which result are transmitted</param>
+        private void CheckMemberAndApplyResults(TypeDefinition typeToScan, IMemberDefinition curMember, bool? defaultValue, List<Configuration.SkipBase> result)
+        {
+            // Only methods of class are to be excluded
+            if (curMember.DeclaringType.FullName.Equals(typeToScan.FullName))
+            {
+                bool toExclude = defaultValue.GetValueOrDefault(false);
+                System.Reflection.ObfuscationAttribute toFind = this.GetAndStripObfuscationCustomAttribute(curMember);
+                if (toFind != null)
+                {
+                    // We have found an Obfuscation attribute, default value doesn't apply
+                    toExclude = toFind.Exclude;
+                }
+
+                if (toExclude)
+                {
+                    Configuration.SkipElement toAdd = null;
+                    switch (curMember.GetType().FullName)
+                    {
+                        case "Mono.Cecil.EventDefinition":
+                            toAdd = new ObfuscarStandardAttributeHelper.Core.Configuration.SkipEvent();
+                            break;
+                        case "Mono.Cecil.FieldDefinition":
+                            toAdd = new ObfuscarStandardAttributeHelper.Core.Configuration.SkipField();
+                            break;
+                        case "Mono.Cecil.PropertyDefinition":
+                            toAdd = new ObfuscarStandardAttributeHelper.Core.Configuration.SkipProperty();
+                            break;
+                        case "Mono.Cecil.MethodDefinition":
+                            toAdd = new ObfuscarStandardAttributeHelper.Core.Configuration.SkipMethod();
+                            break;
+                        default:
+                            throw new NotImplementedException(string.Format("Type {0} is not suppported", curMember.GetType().FullName));
+                    }
+
+                    toAdd.Type = typeToScan.FullName;
+                    toAdd.Name = curMember.Name;
+                    result.Add(toAdd);
+                }
+            }
         }
 
         /// <summary>
@@ -97,6 +151,7 @@
                     // We have found an Obfuscation attribute, default value doesn't apply
                     // let's fill it's attributes
                     result = new System.Reflection.ObfuscationAttribute();
+
                     // 2010-06-05.FL - "all" is already the default value of the object
                     // result.Feature = "all";
                     foreach (CustomAttributeNamedArgument curArg in curAtt.Properties)
@@ -144,94 +199,22 @@
             List<Configuration.SkipBase> result = new List<ObfuscarStandardAttributeHelper.Core.Configuration.SkipBase>();
             foreach (MethodDefinition curMethod in typeToScan.Methods)
             {
-                // Only methods of class are to be excluded
-                if (curMethod.DeclaringType.FullName.Equals(typeToScan.FullName))
-                {
-                    bool toExclude = defaultValue.GetValueOrDefault(false);
-                    System.Reflection.ObfuscationAttribute toFind = this.GetAndStripObfuscationCustomAttribute(curMethod);
-                    if (toFind != null)
-                    {
-                        // We have found an Obfuscation attribute, default value doesn't apply
-                        toExclude = toFind.Exclude;
-                    }
-
-                    if (toExclude)
-                    {
-                        Configuration.SkipMethod toAdd = new ObfuscarStandardAttributeHelper.Core.Configuration.SkipMethod();
-                        toAdd.Type = typeToScan.FullName;
-                        toAdd.Name = curMethod.Name;
-                        result.Add(toAdd);
-                    }
-                }
+                this.CheckMemberAndApplyResults(typeToScan, curMethod, defaultValue, result);
             }
 
             foreach (PropertyDefinition curProperty in typeToScan.Properties)
             {
-                // Only methods of class are to be excluded
-                if (curProperty.DeclaringType.FullName.Equals(typeToScan.FullName))
-                {
-                    bool toExclude = defaultValue.GetValueOrDefault(false);
-                    System.Reflection.ObfuscationAttribute toFind = this.GetAndStripObfuscationCustomAttribute(curProperty);
-                    if (toFind != null)
-                    {
-                        // We have found an Obfuscation attribute, default value doesn't apply
-                        toExclude = toFind.Exclude;
-                    }
-
-                    if (toExclude)
-                    {
-                        Configuration.SkipProperty toAdd = new ObfuscarStandardAttributeHelper.Core.Configuration.SkipProperty();
-                        toAdd.Type = typeToScan.FullName;
-                        toAdd.Name = curProperty.Name;
-                        result.Add(toAdd);
-                    }
-                }
+                this.CheckMemberAndApplyResults(typeToScan, curProperty, defaultValue, result);
             }
 
             foreach (FieldDefinition curField in typeToScan.Fields)
             {
-                // Only methods of class are to be excluded
-                if (curField.DeclaringType.FullName.Equals(typeToScan.FullName))
-                {
-                    bool toExclude = defaultValue.GetValueOrDefault(false);
-                    System.Reflection.ObfuscationAttribute toFind = this.GetAndStripObfuscationCustomAttribute(curField);
-                    if (toFind != null)
-                    {
-                        // We have found an Obfuscation attribute, default value doesn't apply
-                        toExclude = toFind.Exclude;
-                    }
-
-                    if (toExclude)
-                    {
-                        Configuration.SkipField toAdd = new ObfuscarStandardAttributeHelper.Core.Configuration.SkipField();
-                        toAdd.Type = typeToScan.FullName;
-                        toAdd.Name = curField.Name;
-                        result.Add(toAdd);
-                    }
-                }
+                this.CheckMemberAndApplyResults(typeToScan, curField, defaultValue, result);
             }
 
             foreach (EventDefinition curEvent in typeToScan.Events)
             {
-                // Only methods of class are to be excluded
-                if (curEvent.DeclaringType.FullName.Equals(typeToScan.FullName))
-                {
-                    bool toExclude = defaultValue.GetValueOrDefault(false);
-                    System.Reflection.ObfuscationAttribute toFind = this.GetAndStripObfuscationCustomAttribute(curEvent);
-                    if (toFind != null)
-                    {
-                        // We have found an Obfuscation attribute, default value doesn't apply
-                        toExclude = toFind.Exclude;
-                    }
-
-                    if (toExclude)
-                    {
-                        Configuration.SkipEvent toAdd = new ObfuscarStandardAttributeHelper.Core.Configuration.SkipEvent();
-                        toAdd.Type = typeToScan.FullName;
-                        toAdd.Name = curEvent.Name;
-                        result.Add(toAdd);
-                    }
-                }
+                this.CheckMemberAndApplyResults(typeToScan, curEvent, defaultValue, result);
             }
 
             return result;

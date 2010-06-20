@@ -34,3 +34,5 @@ _ReSharper*/
 .svn/
 #ignore tools from TreeSurgeon
 tools
+/src/images/DefaultCloneDetection.cqa.clonedetection.detection.clone-coverage.coverage-map.coverage-map.pattern0.png
+/src/images/DefaultCloneDetection.cqa.clonedetection.detection.clone-coverage.coverage-map.coverage-map.png
